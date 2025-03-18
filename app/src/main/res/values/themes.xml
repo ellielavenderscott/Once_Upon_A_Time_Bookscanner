@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Custom theme extending Theme.AppCompat -->
+    <style name="Theme.BasicBarcode" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize the primary colors of your app -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+
+        <!-- Customize the action bar, if you have one -->
+    </style>
+
+</resources>
