@@ -1,6 +1,7 @@
 package com.isysgroup.basicbarcode
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
@@ -29,15 +30,15 @@ import com.bumptech.glide.request.RequestOptions
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var isbnTextView: TextView
-    private lateinit var titleTextView: TextView
-    private lateinit var authorTextView: TextView
-    private lateinit var publishedDateTextView: TextView
-    private lateinit var descriptionTextView: TextView
-    private lateinit var pagesTextView: TextView
+    private lateinit var isbnEditText: TextView
+    private lateinit var titleEditText: TextView
+    private lateinit var AuthorEditText: TextView
+    private lateinit var publishedDateEditText: TextView
+    private lateinit var descriptionEditText: TextView
+    private lateinit var pagesEditText: TextView
     private lateinit var ratingBar: RatingBar
-    private lateinit var ratingTextView: TextView
-    private lateinit var coverTextView: TextView
+    private lateinit var ratingEditText: TextView
+    private lateinit var coverURLEditText: TextView
     private lateinit var coverImageView: ImageView
 
     private lateinit var barcodeLauncher: ActivityResultLauncher<ScanOptions>
@@ -48,14 +49,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Initialize the TextViews
-        isbnTextView = findViewById(R.id.ISBN)
-        titleTextView = findViewById(R.id.title)
-        authorTextView = findViewById(R.id.author)
-        publishedDateTextView = findViewById(R.id.published_date)
-        descriptionTextView = findViewById(R.id.book_description)
-        coverTextView = findViewById(R.id.cover_url)
-        pagesTextView = findViewById(R.id.pages)
-        ratingTextView = findViewById(R.id.book_rating_value)
+        isbnEditText = findViewById(R.id.ISBN)
+        titleEditText = findViewById(R.id.title)
+        AuthorEditText = findViewById(R.id.author)
+        publishedDateEditText = findViewById(R.id.published_date)
+        descriptionEditText = findViewById(R.id.book_description)
+        coverURLEditText = findViewById(R.id.cover_url)
+        pagesEditText = findViewById(R.id.pages)
+        ratingEditText = findViewById(R.id.book_rating_value)
 
         // Initialize the rating bar
         ratingBar = findViewById(R.id.book_rating)
@@ -66,12 +67,18 @@ class MainActivity : AppCompatActivity() {
         // Set up the scan button
         val scanButton: Button = findViewById(R.id.scan_button)
 
+        // Set up the scan history button
+        val scanHistoryButton: Button = findViewById(R.id.view_history_button)
+
+        // Set up the scan button
+        val saveBookEntryButton: Button = findViewById(R.id.save_entry_button)
+
         // Set up barcode launcher
         barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
             if (result.contents != null) {
                 val barcode = result.contents
                 // Display scanned barcode result
-                isbnTextView.text = "ISBN: $barcode"
+                isbnEditText.text = "$barcode"
                 acquireDetails(barcode)
             } else {
                 Toast.makeText(this, "Scan was cancelled", Toast.LENGTH_SHORT).show()
@@ -83,17 +90,70 @@ class MainActivity : AppCompatActivity() {
             requestCameraPermission()
         }
 
+        // Set up entry listener for the ISBN 13 to auto populate the fields when
+        // any data for the code is manually entered instead of scanning
+        isbnEditText.setOnEditorActionListener { v, actionId, event ->
+            val enteredIsbn = isbnEditText.text.toString().trim()
+            if (enteredIsbn.isNotEmpty()) {
+                acquireDetails(enteredIsbn)
+            }
+            false
+        }
         // Set up click listener for scanning
         scanButton.setOnClickListener {
             startScanner()
         }
+
+        scanHistoryButton.setOnClickListener {
+            val historyIntent = Intent(this, ScanHistoryActivity::class.java)
+            startActivity(historyIntent)
+        }
+
+        // Set up click listener for viewing book scans history
+        saveBookEntryButton.setOnClickListener {
+            saveEntry()
+        }
     }
+
+    private fun clearFields() {
+        isbnEditText.text = ""
+        titleEditText.text = ""
+        AuthorEditText.text = ""
+        publishedDateEditText.text = ""
+        descriptionEditText.text = ""
+        pagesEditText.text = ""
+        coverURLEditText.text = ""
+        ratingBar.rating = 0f
+        ratingEditText.text = ""
+        coverImageView.setImageResource(R.drawable.default_cover_image) // Reset to default image
+    }
+
     private fun requestBodyToString(requestBody: RequestBody): String {
         val buffer = Buffer()
         requestBody.writeTo(buffer)
         return buffer.readUtf8()
     }
+    private fun saveEntry() {
+        // Create a book entry object with the current field values
+        val bookEntry = mapOf(
+            "isbn" to isbnEditText.text.toString(),
+            "title" to titleEditText.text.toString(),
+            "author" to AuthorEditText.text.toString(),
+            "publishedDate" to publishedDateEditText.text.toString(),
+            "description" to descriptionEditText.text.toString(),
+            "pages" to pagesEditText.text.toString(),
+            "rating" to ratingBar.rating.toString(),
+            "coverUrl" to coverURLEditText.text.toString()
+        )
 
+        // TODO: Save this entry to a local database for later syncing
+
+        // Show success message
+        Toast.makeText(this, "Entry saved successfully!", Toast.LENGTH_SHORT).show()
+
+        // Clear all fields for the next scan
+        clearFields()
+    }
     // This method is responsible for making the API call using the scanned ISBN
     private fun acquireDetails(isbn: String) {
         val apiKey = getString(R.string.authorization_key)
@@ -149,20 +209,20 @@ class MainActivity : AppCompatActivity() {
                         runOnUiThread {
                             // Update the text entry fields from the scan result
                             // (The user can also just manually input these if needed)
-                            titleTextView.text = "$title"
-                            authorTextView.text = "$author"
-                            publishedDateTextView.text = "$releaseDate"
-                            descriptionTextView.text = "$description"
-                            isbnTextView.text = "$isbn13"
-                            pagesTextView.text = "$pages"
-                            coverTextView.text = "$coverUrl"
+                            titleEditText.text = "$title"
+                            AuthorEditText.text = "$author"
+                            publishedDateEditText.text = "$releaseDate"
+                            descriptionEditText.text = "$description"
+                            isbnEditText.text = "$isbn13"
+                            pagesEditText.text = "$pages"
+                            coverURLEditText.text = "$coverUrl"
 
                             // Convert rating from String to Float and update RatingBar
                             val ratingValue = rating.toFloatOrNull() ?: 0.0f
                             ratingBar.rating = ratingValue
 
                             // Update the text view for the rating value alongside the stars
-                            ratingTextView.text = String.format("%.1f", ratingValue)
+                            ratingEditText.text = String.format("%.1f", ratingValue)
 
                             // Load the cover image using Glide
                             if (coverUrl != "Cover not found") {
