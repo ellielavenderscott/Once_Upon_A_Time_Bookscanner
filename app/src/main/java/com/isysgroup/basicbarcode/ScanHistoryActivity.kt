@@ -13,7 +13,8 @@ class ScanHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan_history)
 
-        uploadButton = findViewById(R.id.buttonUpload)
+        // Initialize uploadButton after setting the content view
+        uploadButton = findViewById(R.id.upload_all_scans)
 
         // Upload button click (Placeholder logic)
         uploadButton.setOnClickListener {
