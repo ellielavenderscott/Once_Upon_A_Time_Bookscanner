@@ -22,15 +22,21 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BasicBarcode"
-            android:screenOrientation="portrait"> <!-- Lock activity in portrait mode -->
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- ✅ Added ScanHistoryActivity -->
+        <activity android:name=".ScanHistoryActivity"
+            android:label="Scan History"
+            android:theme="@style/Theme.BasicBarcode"
+            android:screenOrientation="portrait"/>
+
         <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation"/>
     </application>
-
 </manifest>
