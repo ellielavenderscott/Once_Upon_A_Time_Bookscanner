@@ -21,11 +21,19 @@
             android:text="Scan Barcodes" />
 
         <Button
-            android:id="@+id/upload_scan"
+            android:id="@+id/view_history_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Upload Book to Database" />
+            android:text="View History" />
+
+        <Button
+            android:id="@+id/save_entry_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save book entry" />
+
     </LinearLayout>
 
     <!-- ScrollView Content -->
