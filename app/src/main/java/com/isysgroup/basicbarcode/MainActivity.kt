@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         coverURLEditText.text = ""
         ratingBar.rating = 0f
         ratingEditText.text = ""
-        coverImageView.setImageResource(R.drawable.default_cover_image) // Reset to default image
+        Glide.with(this@MainActivity).clear(coverImageView)
     }
 
     private fun requestBodyToString(requestBody: RequestBody): String {
@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity() {
 
                             // Update the text view for the rating value alongside the stars
                             ratingEditText.text = String.format("%.1f", ratingValue)
-
+                            Glide.with(this@MainActivity).clear(coverImageView)
                             // Load the cover image using Glide
                             if (coverUrl != "Cover not found") {
                                 Glide.with(this)
@@ -231,6 +231,8 @@ class MainActivity : AppCompatActivity() {
                                     .into(coverImageView)
                             } else {
                                 // Handle case when there is no cover image URL
+                                Log.e("GlideImage", "no cover image")
+
                                 coverImageView.setImageResource(R.drawable.default_cover_image) // Or any default image
                             }
                         }
